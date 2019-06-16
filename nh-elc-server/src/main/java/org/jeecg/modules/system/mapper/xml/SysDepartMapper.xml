@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.system.mapper.SysDepartMapper">
+
+	<select id="queryUserDeparts" parameterType="String" resultType="org.jeecg.modules.system.entity.SysDepart">
+		select a.* from sys_depart a
+			join sys_user_depart b on a.id = b.dep_id
+			where b.user_id = #{userId}
+	</select>
+
+	<select id="queryCompanyUserId" resultType="java.lang.String">
+		select a.* from sys_depart a
+		join sys_user_depart b on a.id = b.dep_id
+		<where>
+			a.org_type=1
+               <if test="_parameter !=null">
+				and b.user_id = #{userId}
+			   </if>
+		</where>
+	</select>
+	<!--查询公司  返回id ，name-->
+	<select id="findAll" resultType="org.jeecg.modules.system.entity.SysDepart">
+		select id,depart_name from sys_depart  where org_type=1
+	</select>
+	<!--根据用户id查询公司-->
+    <select id="queryCompanyByUserId" resultType="org.jeecg.modules.system.vo.SysDepartVo">
+		select d.* ,f.item_text as companyPropertyName from sys_depart d
+		LEFT JOIN (SELECT item_text,item_value from sys_dict_item WHERE dict_id=(SELECT id from sys_dict WHERE
+                      dict_code='company_property'))f on f.item_value=d.company_property
+		WHERE  org_type=1 and d.id in ( select b.dep_id from sys_user_depart b WHERE b.user_id =#{userId})
+	</select>
+	<!--根据id查询公司-->
+    <select id="queryCompanyById" resultType="org.jeecg.modules.system.entity.SysDepart">
+		select * from sys_depart where org_type=1 and id=#{id}
+	</select>
+	<!--查询企业公司-->
+	<select id="queryBusConmpanyItems" resultType="org.jeecg.modules.system.entity.SysDepart">
+		select id,depart_name from sys_depart  where org_type=1 and company_property not in ('5','6')
+	</select>
+</mapper>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.equipmentrecord.mapper.EquipmentRecordMapper">
+
+    <update id="editByEquipmentId">
+        update equipment_record set `status` = 2 where  equipment_id=#{equipmentId}
+    </update>
+    <update id="updateEquipmentRecord">
+        update equipment_record set
+              equipment_id=#{equipmentRecord.equipmentId},
+              check_time=#{equipmentRecord.checkTime},
+              result=#{equipmentRecord.result},
+              next_check_time=#{equipmentRecord.nextCheckTime},
+              note=#{equipmentRecord.note},
+              add_time=#{equipmentRecord.addTime},
+              add_type=#{equipmentRecord.addType},
+              status=#{equipmentRecord.status},
+              uid=#{equipmentRecord.uid},
+        where id=#{equipmentRecord.id}
+    </update>
+
+    <select id="queryByEquipId" resultType="org.jeecg.modules.equipmentrecord.entity.EquipmentRecord">
+        select  * from equipment_record where  equipment_id =#{equipmentId}
+    </select>
+    <!--根据设备id统计record表数据-->
+    <select id="queryCountByEquipmentId" resultType="java.lang.Integer">
+        select  count(1) from equipment_record where  equipment_id =#{equipmentId}
+    </select>
+    <select id="queryRecordIdByEquipId" resultType="java.lang.Integer">
+         select  id from equipment_record where  equipment_id =#{equipmentId}
+    </select>
+</mapper>

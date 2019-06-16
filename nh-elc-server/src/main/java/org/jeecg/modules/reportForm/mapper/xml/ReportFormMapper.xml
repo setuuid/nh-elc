@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.reportForm.mapper.ReportFormMapper">
+<select id="queryEliminateEquipment" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+select 
+		IFNULL(tmp.depart_name,'total') as departname ,
+		tmp.company_id,tmp.e_type_id,tmp.status,tmp.use_status,
+		SUM(if(tmp.e_type_id =1 and tmp.use_status=3,tmp.sum1,0)) AS type_1_1 , 
+		SUM(if(tmp.e_type_id =1 and tmp.use_status !=1 and tmp.plan_destory_time is not null,tmp.sum2,0)) AS type_1_2 ,
+		SUM(if(tmp.e_type_id =2 and tmp.use_status=3,tmp.sum1,0)) AS type_2_1, 
+		SUM(if(tmp.e_type_id =2 and tmp.use_status !=1 and tmp.plan_destory_time is not null,tmp.sum2,0)) AS type_2_2 ,
+		SUM(if(tmp.e_type_id =3 and tmp.use_status=3,tmp.sum1,0)) AS type_3_1, 
+		SUM(if(tmp.e_type_id =3 and tmp.use_status !=1 and tmp.plan_destory_time is not null,tmp.sum2,0)) AS type_3_2 ,
+		SUM(if(tmp.e_type_id =4 and tmp.use_status=3,tmp.sum1,0)) AS type_4_1, 
+		SUM(if(tmp.e_type_id =4 and tmp.use_status !=1 and tmp.plan_destory_time is not null,tmp.sum2,0)) AS type_4_2 ,
+		SUM(if((tmp.e_type_id =5 or tmp.e_type_id =6) and tmp.use_status=3,tmp.sum1,0)) AS type_5_1, 
+		SUM(if((tmp.e_type_id =5 or tmp.e_type_id =6) and tmp.use_status !=1 and tmp.plan_destory_time is not null,tmp.sum2,0)) AS type_5_2 ,
+		<!--  SUM(if(tmp.e_type_id =6 and tmp.use_status=3,tmp.sum1,0)) AS type_6_1, 
+		SUM(if(tmp.e_type_id =6 and tmp.use_status !=1 and tmp.plan_destory_time is not null,tmp.sum2,0)) AS type_6_2 ,-->
+		SUM(if(tmp.sum1,tmp.sum1,0)) AS 'total_1',
+		SUM(if(tmp.sum2,tmp.sum2,0)) AS 'total_2' 
+		from (
+		      select ssd.id company_id,ssd.depart_name,innertmp.e_type_id,innertmp.use_status,innertmp.plan_destory_time,innertmp.status,innertmp.sum1,innertmp.sum2 from sys_depart ssd left join  (
+					select  equ.company_id,equ.e_type_id,equ.use_status,equ.plan_destory_time,equ.status,if(equ.use_status=3,1,0) sum1,
+					if(equ.plan_destory_time is not null,1,0) sum2 
+					from equipment equ 
+					LEFT JOIN e_type etype on equ.e_type_id = etype.id
+					where  ( equ.status =1 and equ.use_status =3 and DATE_FORMAT(equ.real_destory_time,'%Y')=#{year} 
+					<if test="companyId !=null and companyId !=''">
+				     and equ.company_id=#{companyId}
+				     </if>
+					 ) or (  equ.status= 1  and equ.plan_destory_time is not null and DATE_FORMAT(equ.plan_destory_time,'%Y')=#{year} 
+					 <if test="companyId !=null and companyId !=''">
+				     and equ.company_id=#{companyId}
+				     </if>
+					 ) order by equ.company_id 
+				) innertmp on ssd.id=innertmp.company_id where ssd.status=1 
+				<if test="companyId !=null and companyId !=''">
+				   and ssd.id=#{companyId}
+				</if>
+				) tmp 
+		GROUP BY tmp.company_id WITH ROLLUP
+</select>
+
+
+<select id="queryEliminateSpecialEquipment"  parameterType="java.util.HashMap" resultType="java.util.HashMap">
+select 
+		IFNULL(tmp.name,'total') as category_name ,tmp.category_id,
+		tmp.company_id,tmp.depart_name company_name,tmp.e_type_id,tmp.status,tmp.use_status,
+		SUM(if( tmp.use_status=3,tmp.sum1,0)) AS type_1_1 , 
+		SUM(if( tmp.use_status !=1 and tmp.plan_destory_time is not null,tmp.sum2,0)) AS type_1_2 ,
+		SUM(if(tmp.sum1,tmp.sum1,0)) AS 'total_1',
+		SUM(if(tmp.sum2,tmp.sum2,0)) AS 'total_2' 
+		from (
+               select ecate.id category_id,innertmp.company_id,innertmp.depart_name,ecate.name,innertmp.e_type_id,innertmp.use_status,innertmp.plan_destory_time,innertmp.status,if(innertmp.sum1 is not null,innertmp.sum1,0) sum1,if(innertmp.sum2 is not null,innertmp.sum2,0) sum2 from e_category ecate left join  (
+					select  equ.company_id ,ssd.depart_name,equ.e_type_id,equ.e_category_id,equ.use_status,equ.plan_destory_time,equ.status,
+		          if(equ.use_status=3,1,0) sum1,
+							if(equ.plan_destory_time is not null,1,0) sum2 
+							from equipment equ 
+							LEFT JOIN e_type etype on equ.e_type_id = etype.id
+		          LEFT JOIN sys_depart ssd on equ.company_id = ssd.id
+							where  ( equ.status =1 and equ.use_status =3 and DATE_FORMAT(equ.real_destory_time,'%Y')=#{year} and equ.company_id=#{companyId} ) or (  equ.status= 1  and equ.plan_destory_time is not null and DATE_FORMAT(equ.plan_destory_time,'%Y')=#{year} and equ.company_id=#{companyId}) order by equ.company_id 
+						) innertmp on ecate.id=innertmp.e_category_id  where ecate.`status`=1 and ecate.type=1
+         ) tmp 
+		GROUP BY tmp.category_id WITH ROLLUP
+</select>
+   
+</mapper>

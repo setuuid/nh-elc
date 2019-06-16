@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="nh-elc:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="nh-elc.war">
+      <element id="artifact" artifact-name="nh-elc:war exploded" />
+    </root>
+  </artifact>
+</component>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.ecategory.mapper.ECategoryMapper">
+    <resultMap id="ECategory" type="org.jeecg.modules.ecategory.entity.ECategory" >
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="ord" property="ord" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="VARCHAR"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="e_group" property="eGroup" jdbcType="INTEGER"/>
+    </resultMap>
+    <select id="queryItemsECateGory" resultType="org.jeecg.modules.ecategory.entity.ECategory">
+        select id,name,ord,status,type,e_group from e_category
+        <where>
+            1=1
+            <if test="eTypeId!=null">
+               and id in(SELECT category_id FROM `e_type_category` WHERE type_id= #{eTypeId} )
+            </if>
+        </where>
+    </select>
+    <select id="queryECateGoryItems" resultType="org.jeecg.modules.ecategory.entity.ECategory">
+          select id,name from e_category
+    </select>
+</mapper>

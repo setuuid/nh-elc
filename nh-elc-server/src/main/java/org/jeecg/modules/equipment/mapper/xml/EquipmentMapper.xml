@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.equipment.mapper.EquipmentMapper">
+    <resultMap id="Equipment" type="org.jeecg.modules.equipment.entity.Equipment" >
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="VARCHAR"/>
+        <result column="company_id" property="companyId" jdbcType="VARCHAR"/>
+        <result column="e_type_id" property="eTypeId" jdbcType="INTEGER"/>
+        <result column="e_category_id" property="eCategoryId" jdbcType="INTEGER"/>
+        <result column="safe_level" property="safeLevel" jdbcType="VARCHAR"/>
+        <result column="bit_number" property="bitNumber" jdbcType="VARCHAR"/>
+        <result column="unit" property="unit" jdbcType="VARCHAR"/>
+        <result column="model" property="model" jdbcType="VARCHAR"/>
+        <result column="use_status" property="useStatus" jdbcType="VARCHAR"/>
+        <result column="use_time" property="useTime" jdbcType="TIMESTAMP"/>
+        <result column="year" property="year" jdbcType="VARCHAR"/>
+        <result column="destory_time" property="destoryTime" jdbcType="TIMESTAMP"/>
+        <result column="real_destory_time" property="realDestoryTime" jdbcType="TIMESTAMP"/>
+        <result column="plan_destory_time" property="planDestoryTime" jdbcType="TIMESTAMP"/>
+        <result column="status" property="status" jdbcType="VARCHAR"/>
+        <result column="add_time" property="addTime" jdbcType="TIMESTAMP"/>
+        <result column="last_update_time" property="lastUpdateTime" jdbcType="TIMESTAMP"/>
+        <result column="uid" property="uid" jdbcType="VARCHAR"/>
+        <result column="factory_num" property="factoryNum" jdbcType="VARCHAR"/>
+        <result column="use_card_num" property="useCardNum" jdbcType="VARCHAR"/>
+        <result column="main_note" property="mainNote" jdbcType="VARCHAR"/>
+        <result column="check_organization" property="checkOrganization" jdbcType="VARCHAR"/>
+        <result column="maintenance_unit" property="maintenanceUnit" jdbcType="VARCHAR"/>
+        <result column="rated_load" property="ratedLoad" jdbcType="VARCHAR"/>
+        <result column="qrcode_linksrc" property="qrcodeLinksrc" jdbcType="VARCHAR"/>
+        <result column="qrcode_imgsrc" property="qrcodeImgsrc" jdbcType="VARCHAR"/>
+        <result column="create_by" property="createBy" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_by" property="updateBy" jdbcType="VARCHAR"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <resultMap id="map" type="HashMap">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="depart_name" property="companyId" jdbcType="VARCHAR"/>
+        <result column="type_name" property="eTypeId" jdbcType="INTEGER"/>
+        <result column="use_time" property="useTime" jdbcType="TIMESTAMP"/>
+        <result column="plan_destory_time" property="planDestoryTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <resultMap id="map1" type="HashMap">
+        <result property="key" column="e_type_id" javaType="java.lang.Integer"/>
+        <result property="name" column="name" javaType="java.lang.String"/>
+        <result property="value" column="census" javaType="java.lang.Integer"/>
+    </resultMap>
+
+    <resultMap id="map2" type="HashMap">
+        <result property="key" column="use_status" javaType="java.lang.String"/>
+        <result property="value" column="census" javaType="java.lang.Integer"/>
+    </resultMap>
+    <resultMap id="map3" type="HashMap">
+        <result property="key" column="id" javaType="java.lang.Integer"/>
+        <result property="value" column="census" javaType="java.lang.Integer"/>
+    </resultMap>
+    <resultMap id="CountByCompanyMap" type="HashMap">
+        <result property="census" column="census" javaType="java.lang.Integer"/>
+        <result property="company_id" column="company_id" javaType="java.lang.String"/>
+
+        <result property="e_type_id" column="type" javaType="java.lang.String"/>
+        <result property="total" column="total" javaType="java.lang.Integer"/>
+        <result property="eid" column="eid" javaType="java.lang.Integer"/>
+    </resultMap>
+
+    <resultMap id="CountBytypeMap" type="HashMap">
+        <result property="company_id" column="company_id" javaType="java.lang.String"/>
+        <result property="use_status" column="use_status" javaType="java.lang.String"/>
+        <result property="statistics" column="statistics" javaType="java.lang.Integer"/>
+        <result property="census" column="census" javaType="java.lang.String"/>
+        <result property="total" column="total" javaType="java.lang.String"/>
+    </resultMap>
+    <!-- 添加-->
+    <insert id="add" keyProperty="id" useGeneratedKeys="true">
+        insert into equipment (id,company_id,e_type_id,e_category_id,name,safe_level,bit_number,
+                            unit,model,use_status,use_time,year,destory_time,real_destory_time,
+                            plan_destory_time,status,add_time,last_update_time,uid,factory_num,use_card_num,
+                            main_note,check_organization,maintenance_unit,rated_load,qrcode_linksrc,qrcode_imgsrc
+                            )
+        values (#{id,jdbcType=INTEGER},#{companyId,jdbcType=INTEGER}, #{eTypeId,jdbcType=INTEGER},  #{eCategoryId,jdbcType=INTEGER},
+        #{name,jdbcType=VARCHAR},#{safeLevel,jdbcType=VARCHAR},#{bitNumber,jdbcType=VARCHAR},#{unit},#{model},#{useStatus},#{useTime},
+        #{year},#{destoryTime},#{realDestoryTime},#{planDestoryTime},#{status},#{addTime},#{lastUpdateTime},#{uid},#{factoryNum},#{useCardNum},
+        #{mainNote},#{checkOrganization},#{maintenanceUnit},#{ratedLoad},#{qrcodeLinksrc},#{qrcodeImgsrc}
+        )
+    </insert>
+
+    <!-- 更新设备 状态-->
+    <update id="editById" >
+        update equipment set `status` = 2 where  id=#{id}
+    </update>
+    <!-- 更新-->
+    <update id="updateEquipment">
+        update equipment set
+              company_id=#{equipment.companyId},
+              e_type_id=#{equipment.eTypeId},
+              e_category_id=#{equipment.eCategoryId},
+              name=#{equipment.name},
+              safe_level=#{equipment.safeLevel},
+              bit_number=#{equipment.bitNumber},
+              unit=#{equipment.unit},
+              model=#{equipment.model},
+              use_status=#{equipment.useStatus},
+              use_time=#{equipment.useTime},
+              year=#{equipment.year},
+              destory_time=#{equipment.destoryTime},
+              real_destory_time=#{equipment.realDestoryTime},
+              plan_destory_time=#{equipment.planDestoryTime},
+              status=#{equipment.status},
+              add_time=#{equipment.addTime},
+              last_update_time=#{equipment.lastUpdateTime},
+              uid=#{equipment.uid},
+              factory_num=#{equipment.factoryNum},
+              use_card_num=#{equipment.useCardNum},
+              main_note=#{equipment.mainNote},
+              check_organization=#{equipment.checkOrganization},
+              maintenance_unit=#{equipment.maintenanceUnit},
+              rated_load=#{equipment.ratedLoad},
+              qrcode_linksrc=#{equipment.qrcodeLinksrc},
+              qrcode_imgsrc=#{equipment.qrcodeImgsrc}
+        where  id=#{equipment.id}
+    </update>
+
+    <!--计划淘汰列表查询-->
+    <select id="EquipmentByPlanTime"  resultMap="map">
+       SELECT a.id, depart_name, c.`name` type_name,a.`name`,use_time,plan_destory_time from equipment a
+       JOIN sys_depart b on a.company_id = b.id
+       JOIN e_type c on a.e_type_id = c.id WHERE YEAR(plan_destory_time) = YEAR((SELECT NOW()))  AND a.`status`=1
+
+    </select>
+    <!--饼状图统计-->
+    <select id="EquipmentByEtype" resultMap="map1">
+    select c.id e_type_id,c.name,sum(sum1)census from (
+    select b.id,b.`name`,if(a.id is null ,0,1) sum1 from e_type b LEFT JOIN equipment a on b.id =a.e_type_id  ) c GROUP BY c.id
+    </select>
+    <!--设备使用状态统计-->
+    <select id="EquipmentByStatus" resultMap="map2">
+       select c.item_value use_status,SUM(sum1) census from(
+SELECT a.item_value ,b.id ,if(id is null ,0,1) sum1 from (
+select item_value from sys_dict_item where dict_id in(
+select id from sys_dict where dict_code ='use_status')) a LEFT JOIN  equipment b on a.item_value =b.use_status) c GROUP BY c.item_value
+
+    </select>
+    <!--计划淘汰设备统计-->
+    <select id="EquipmentBytime" resultMap="map3">
+        SELECT 4 as id,COUNT(1) as census from equipment where plan_destory_time is NOT NULL  AND `status`=1
+    </select>
+    <!--超期服役设备统计-->
+    <select id="EquipmentBydestory" resultMap="map3">
+        SELECT 5 as id ,COUNT(1) as census from equipment a JOIN equipment_record b on a.id = b.equipment_id
+        WHERE if((DATE_ADD(use_time,INTERVAL `year` YEAR))>b.next_check_time,(DATE_ADD(use_time,INTERVAL `year` YEAR)),b.next_check_time) &lt; NOW() AND a.use_status=2 AND a.`status`=1 AND b.`status` = 1;
+    </select>
+    <!--预警设备统计-->
+    <select id="EquipmentByrecord" resultMap="map3">
+        select  6 as id,COUNT(1) as census from equipment a
+        INNER JOIN equipment_record b on a.id=b.equipment_id
+        where a.`status`=1 AND a.use_status=2 and b.`status`=1
+        and b.next_check_time is not null
+        and (SELECT TIMESTAMPDIFF(MONTH,NOW(),b.next_check_time)) BETWEEN 0 AND 3
+    </select>
+    <!-- 根据设备id 查询设备 -->
+    <select id="queryById" resultType="org.jeecg.modules.equipment.vo.EquipmentVo">
+            SELECT
+                a.id,
+                a.company_id as companyId,
+                a.e_type_id as eTypeId,
+                a.e_category_id as eCategoryId,
+                a.`name` ,
+                a.safe_level as safeLevel,
+                a.bit_number as bitNumber,
+                a.unit,
+                a.model,
+                a.use_status as useStatus,
+                a.use_time as useTime,
+                a.`year` ,
+                a.destory_time as destoryTime,
+                a.real_destory_time as realDestoryTime,
+                a.plan_destory_time as planDestoryTime,
+                a.`status`,
+                a.add_time as addTime,
+                a.last_update_time as lastUpdateTime ,
+                a.uid,
+                a.factory_num as factoryNum,
+                a.use_card_num as useCardNum,
+                a.main_note AS mainNote,
+                a.check_organization as checkOrganization,
+                a.maintenance_unit as maintenanceUnit,
+                a.rated_load as ratedLoad,
+                a.qrcode_linksrc as qrcodeLinksrc,
+                a.qrcode_imgsrc as qrcodeImgsrc,
+                a.create_by as createBy,
+                a.create_time as createTime,
+                a.update_by as updateBy,
+                a.update_time as updateTime,
+            b.depart_name as companyName,
+            h.id as equipmentRecordId,
+            c.`name` as eTypeName ,
+            d.`name` as eCategoryName ,
+            e.username,
+            f.item_text as useStateText,
+            h.check_time as checkTime,
+            j.item_text as testResult,
+            h.next_check_time as nextCheckTime,
+            h.note ,
+            h.result,
+            a.id as equipmentId,
+            h.add_type as addType
+            FROM equipment a
+            LEFT JOIN equipment_record h on h.equipment_id=a.id
+            INNER JOIN sys_depart b on a.company_id = b.id
+            INNER JOIN e_type c on a.e_type_id= c.id
+            INNER JOIN e_category d on a.e_category_id=d.id
+            LEFT JOIN  sys_user e on a.uid = e.id
+            LEFT JOIN (SELECT item_text,item_value from sys_dict_item WHERE dict_id=(SELECT id from sys_dict WHERE
+                      dict_code='use_status'))f on f.item_value=a.use_status
+            LEFT JOIN (SELECT item_text,item_value from sys_dict_item WHERE dict_id=(SELECT id from sys_dict WHERE
+                      dict_code='check_result'))j on j.item_value= h.result
+        where a.id=#{id} and a.status = '1' and h.status = '1'
+    </select>
+
+    <!-- 条件查询 -->
+    <select id="queryListByParam" resultType="org.jeecg.modules.equipment.vo.EquipmentVo">
+        SELECT
+        a.id,
+        a.company_id as companyId,
+        a.e_type_id as eTypeId,
+        a.e_category_id as eCategoryId,
+        a.`name` ,
+        a.safe_level as safeLevel,
+        a.bit_number as bitNumber,
+        a.unit,
+        a.model,
+        a.use_status as useStatus,
+        a.use_time as useTime,
+        a.`year` ,
+        a.destory_time as destoryTime,
+        a.real_destory_time as realDestoryTime,
+        a.plan_destory_time as planDestoryTime,
+        a.`status`,
+        a.add_time as addTime,
+        a.last_update_time as lastUpdateTime ,
+        a.uid,
+        a.factory_num as factoryNum,
+        a.use_card_num as useCardNum,
+        a.main_note AS mainNote,
+        a.check_organization as checkOrganization,
+        a.maintenance_unit as maintenanceUnit,
+        a.rated_load as ratedLoad,
+        a.qrcode_linksrc as qrcodeLinksrc,
+        a.qrcode_imgsrc as qrcodeImgsrc,
+        a.create_by as createBy,
+        a.create_time as createTime,
+        a.update_by as updateBy,
+        a.update_time as updateTime,
+        b.depart_name as companyName,
+        c.`name` as eTypeName ,
+        d.`name` as eCategoryName ,
+        e.username,
+        f.item_text as useStateText
+        from equipment a
+        INNER JOIN sys_depart b on a.company_id = b.id
+        INNER JOIN e_type c on a.e_type_id= c.id
+        INNER JOIN e_category d on a.e_category_id=d.id
+        LEFT JOIN  sys_user e on a.uid = e.id
+        LEFT JOIN (SELECT item_text,item_value from sys_dict_item WHERE dict_id=(SELECT id from sys_dict WHERE
+        dict_code='use_status'))f on f.item_value=a.use_status
+        <where>
+            a.status='1'
+            <if test="param2.id !=null">
+                and a.id=#{param2.id}
+            </if>
+            <if test="param2.name != null">
+                and a.name like CONCAT('%',#{param2.name},'%')
+            </if>
+            <if test="param2.eTypeId != null">
+                and a.e_type_id = #{param2.eTypeId}
+            </if>
+            <if test="param2.eCategoryId != null">
+                and a.e_category_id = #{param2.eCategoryId}
+            </if>
+            <if test="param2.companyId != null and param2.companyId !=''">
+                and a.company_id =#{param2.companyId}
+            </if>
+            <if test="param2.unit != null and param2.unit!=''">
+                and a.unit like CONCAT('%',#{param2.unit},'%')
+            </if>
+            <if test="param2.bitNumber != null and param2.bitNumber!=''">
+                and a.bit_number like CONCAT('%',#{param2.bitNumber},'%')
+            </if>
+            <if test="param2.safeLevel != null and param2.safeLevel!=''">
+                and a.safe_level like CONCAT('%',#{param2.safeLevel},'%')
+            </if>
+            <if test="param2.year != null and param2.year!=''">
+                and a.year = #{param2.year}
+            </if>
+            <if test="param2.ids !=null">
+                and a.id in (${param2.ids})
+            </if>
+            <if test="param2.realDestoryDate !=null and param2.realDestoryDate!= ''">
+                and year(a.real_destory_time) =#{param2.realDestoryDate}
+            </if>
+            <!--<if test="param2.endYear !=null and param2.endYear!= '' and param2.startYear !=null and param2.startYear!= ''">-->
+                <!--and a.year >= #{param2.startYear}   and  a.year &lt;=#{param2.endYear}-->
+            <!--</if>-->
+            <!--<if test="param2.endYear == null and param2.endYear == '' and param2.startYear !=null and param2.startYear!= ''">-->
+                <!--and a.year >= #{param2.startYear}   -->
+            <!--</if>-->
+            <if test="param2.useCountYear !=null and param2.useCountYear != '' and param2.deiOrPlanDeiType == 1 ">
+                and year(a.real_destory_time)=#{param2.useCountYear} and a.use_status='3'
+            </if>
+            <if test="param2.useCountYear !=null and param2.useCountYear != '' and param2.deiOrPlanDeiType == 2 ">
+                 and year(a.plan_destory_time)=#{param2.useCountYear} and a.plan_destory_time is not null
+            </if>
+            <if test="param2.useStatus != null and param2.useStatus !=''">
+                AND a.use_status =#{param2.useStatus}
+            </if>
+            <if test="param2.yearType != null  and param2.yearType == 1 ">
+                AND   timestampdiff(year,a.use_time,NOW()) >5  and   timestampdiff(year,a.use_time,NOW()) &lt; 15
+            </if>
+            <if test="param2.yearType != null  and param2.yearType == 2 ">
+                AND   timestampdiff(year,a.use_time,NOW()) >8  and timestampdiff(year,a.use_time,NOW()) &lt; 15
+            </if>
+            <if test="param2.yearType != null  and param2.yearType == 3 ">
+                AND   timestampdiff(year,a.use_time,NOW()) >10  and  timestampdiff(year,a.use_time,NOW()) &lt; 15
+            </if>
+            <if test="param2.yearType != null  and param2.yearType == 4 ">
+                AND   timestampdiff(year,a.use_time,NOW()) &gt;= 15
+            </if>
+        </where>
+        ORDER BY addTime desc
+    </select>
+    <!--公司设备使用状况统计-->
+    <select id="queryCountByCompany" resultMap="CountByCompanyMap">
+       SELECT tmp.company,companyid,eid,SUM(IF(tmp.eid='1',tmp.census,0 )) type_1,
+										SUM(IF(tmp.eid='2',tmp.census,0 )) type_2,
+										SUM(CASE tmp.eid WHEN '3' then tmp.census else 0 END) type_3,
+										SUM(CASE tmp.eid WHEN '4' then tmp.census else 0 END) type_4,
+										SUM(CASE tmp.eid WHEN '5' then tmp.census else 0 END) type_5,
+										SUM(CASE tmp.eid WHEN '6' then tmp.census else 0 END) type_6,
+										tmp.total
+                                        FROM (SELECT  COUNT(1) as census,b.depart_name as company,a.company_id companyid,c.`name` type ,a.e_type_id eid,ss.s total from equipment a
+                                        JOIN (SELECT COUNT(1)as s,company_id from equipment where `status` = 1 GROUP BY company_id) as ss
+					                      on ss.company_id = a.company_id
+				                        JOIN sys_depart b on a.company_id=b.id
+				                        JOIN e_type c ON a.e_type_id = c.id
+				                        WHERE a.status=1
+				                        GROUP BY company,type) tmp GROUP BY tmp.company ;
+    </select>
+<!--设备类别统计-->
+    <select id="queryCountBytype" resultMap="CountBytypeMap" parameterType="java.lang.String">
+        SELECT  tmp.company_id,tmp.company,tmp.census,tmp.total,SUM(IF(tmp.use_status='2',tmp.statistics,0 )) type_1,SUM(IF(tmp.use_status='3',tmp.statistics,0 ))type_2 from
+        (SELECT f.depart_name as company,f.id as company_id, a.use_status,COUNT(a.id) statistics, IFNULL(b.census,0) census,IFNULL(e.total,0) total FROM equipment a
+        LEFT JOIN (SELECT a.company_id ,COUNT(1) as census from equipment a JOIN equipment_record b on a.id = b.equipment_id
+        WHERE if((DATE_ADD(use_time,INTERVAL `year` YEAR))>b.next_check_time,(DATE_ADD(use_time,INTERVAL `year` YEAR)),b.next_check_time)
+        &lt; NOW() AND a.use_status=2 AND a.`status`=1 and a.e_type_id = #{typeid} GROUP BY a.company_id) b
+        on a.company_id= b.company_id
+        LEFT JOIN (SELECT company_id ,equipment_id, COUNT(1) as total from equipment c
+        JOIN equipment_record d on c.id =d.equipment_id
+        WHERE ( SELECT TIMESTAMPDIFF(MONTH,NOW(),d.next_check_time)) BETWEEN 0 AND 3 AND d.status=1 AND c.`status`=1 AND c.use_status=2 AND c.e_type_id = #{typeid} GROUP BY company_id) e
+        on e.company_id = a.company_id
+        JOIN sys_depart f on a.company_id=f.id
+        where a.e_type_id = #{typeid} and a.`status`=1
+        GROUP BY a.company_id,a.use_status) tmp GROUP BY company_id;
+
+
+    </select>
+
+    <!-- 查询所有 -->
+    <select id="queryAll" resultType="org.jeecg.modules.equipment.vo.EquipmentVo">
+        select * from (
+            SELECT
+                a.id,
+                a.company_id as companyId,
+                a.e_type_id as eTypeId,
+                a.e_category_id as eCategoryId,
+                a.`name` ,
+                a.safe_level as safeLevel,
+                a.bit_number as bitNumber,
+                a.unit,
+                a.model,
+                a.use_status as useStatus,
+                a.use_time as useTime,
+                a.`year` ,
+                a.destory_time as destoryTime,
+                a.real_destory_time as realDestoryTime,
+                a.plan_destory_time as planDestoryTime,
+                a.`status`,
+                a.add_time as addTime,
+                a.last_update_time as lastUpdateTime ,
+                a.uid,
+                a.factory_num as factoryNum,
+                a.use_card_num as useCardNum,
+                a.main_note AS mainNote,
+                a.check_organization as checkOrganization,
+                a.maintenance_unit as maintenanceUnit,
+                a.rated_load as ratedLoad,
+                a.qrcode_linksrc as qrcodeLinksrc,
+                a.qrcode_imgsrc as qrcodeImgsrc,
+                a.create_by as createBy,
+                a.create_time as createTime,
+                a.update_by as updateBy,
+                a.update_time as updateTime,
+            b.depart_name as companyName,
+            c.`name` as eTypeName ,
+            d.`name` as eCategoryName ,
+            e.username,
+            f.item_text as useStateText,
+            h.check_time as checkTime,
+            j.item_text as testResult,
+            h.next_check_time as nextCheckTime,
+            h.note
+            FROM equipment a
+            LEFT JOIN equipment_record h on h.equipment_id=a.id
+            INNER JOIN sys_depart b on a.company_id = b.id
+            INNER JOIN e_type c on a.e_type_id= c.id
+            INNER JOIN e_category d on a.e_category_id=d.id
+            LEFT JOIN  sys_user e on a.uid = e.id
+            INNER JOIN (SELECT item_text,item_value from sys_dict_item WHERE dict_id=(SELECT id from sys_dict WHERE
+                      dict_code='use_status'))f on f.item_value=a.use_status
+
+            LEFT JOIN (SELECT item_text,item_value from sys_dict_item WHERE dict_id=(SELECT id from sys_dict WHERE
+                      dict_code='check_result'))j on j.item_value= h.result
+            <where>
+                a.status='1' and h.status='1'
+                <if test="companyId != null and companyId != '' ">
+                    and  a.company_id=#{companyId}
+                </if>
+                <if test="id != null">
+                    and a.id = #{id}
+                </if>
+            </where>
+        ) g
+    </select>
+    <!--查询预警设备ID-->
+    <select id="queryFindId" resultType="java.util.Map">
+        SELECT a.id from equipment a
+        INNER JOIN equipment_record b on a.id=b.equipment_id
+        where a.`status`=1 AND a.use_status=2 and b.`status`=1
+        and b.next_check_time is not null
+        and (SELECT TIMESTAMPDIFF(MONTH,NOW(),b.next_check_time)) BETWEEN 0 AND 3
+    </select>
+    <!--查询超期服役设备ID-->
+    <select id="queryFindIdByTime" resultType="java.lang.Integer">
+        SELECT a.id from equipment a JOIN equipment_record b on a.id = b.equipment_id
+        WHERE if((DATE_ADD(use_time,INTERVAL `year` YEAR))>b.next_check_time,(DATE_ADD(use_time,INTERVAL `year` YEAR)),b.next_check_time) &lt;NOW() AND a.use_status=2 AND a.`status`=1 AND b.`status` = 1;
+    </select>
+    <select id="queryCensusById" resultType="java.util.Map" parameterType="java.lang.String">
+       SELECT company_id,e.depart_name,
+				SUM(IF(eid='1',census,0 )) e_category_id1,
+				SUM(IF(eid='2',census,0 )) e_category_id2,
+				SUM(IF(eid='3',census,0 )) e_category_id3,
+				SUM(IF(eid='4',census,0 )) e_category_id4,
+				SUM(IF(eid='5',census,0 )) e_category_id5,
+				SUM(IF(eid='11',census,0 )) e_category_id6,
+				SUM(IF(eid='12',census,0 )) e_category_id7,
+				SUM(IF(eid='13',census,0 )) e_category_id8
+      from(
+	      SELECT b.id eid,COUNT(1) census,a.company_id company_id from equipment a
+	              left JOIN e_category b on a.e_category_id = b.id WHERE  a.`status`=1 and a.e_type_id=1 AND a.company_id= #{companyId} GROUP BY eid) d
+				  JOIN sys_depart e on company_id =  e.id GROUP BY company_id
+    </select>
+</mapper>

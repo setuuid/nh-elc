@@ -1,0 +1,300 @@
+<template>
+  <a-card :bordered="false">
+
+    <!-- 查询区域 -->
+    <div class="table-page-search-wrapper">
+      <a-form layout="inline">
+        <a-row :gutter="24">
+
+          <a-col :md="6" :sm="12">
+            <a-form-item label="账号">
+              <a-input placeholder="请输入账号查询" v-model="queryParam.username"></a-input>
+            </a-form-item>
+          </a-col>
+
+          <a-col :md="6" :sm="8">
+            <a-form-item label="性别">
+              <a-select v-model="queryParam.sex" placeholder="请选择性别查询">
+                <a-select-option value="">请选择性别查询</a-select-option>
+                <a-select-option value="1">男性</a-select-option>
+                <a-select-option value="2">女性</a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+
+
+          <template v-if="toggleSearchStatus">
+            <a-col :md="6" :sm="8">
+              <a-form-item label="邮箱">
+                <a-input placeholder="请输入邮箱查询" v-model="queryParam.email"></a-input>
+              </a-form-item>
+            </a-col>
+
+            <a-col :md="6" :sm="8">
+              <a-form-item label="手机号码">
+                <a-input placeholder="请输入手机号码查询" v-model="queryParam.phone"></a-input>
+              </a-form-item>
+            </a-col>
+          </template>
+
+          <a-col :md="6" :sm="8">
+            <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
+              <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
+              <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
+              <a @click="handleToggleSearch" style="margin-left: 8px">
+                {{ toggleSearchStatus ? '收起' : '展开' }}
+                <a-icon :type="toggleSearchStatus ? 'up' : 'down'"/>
+              </a>
+            </span>
+          </a-col>
+
+        </a-row>
+      </a-form>
+    </div>
+
+    <!-- table区域-begin -->
+    <div>
+      <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">
+        <i class="anticon anticon-info-circle ant-alert-icon"></i>已选择&nbsp;<a style="font-weight: 600">{{
+        selectedRowKeys.length }}</a>项&nbsp;&nbsp;
+        <a style="margin-left: 24px" @click="onClearSelected">清空</a>
+      </div>
+
+      <a-table
+        ref="table"
+        bordered
+        size="middle"
+        rowKey="id"
+        :columns="columns"
+        :dataSource="dataSource"
+        :pagination="ipagination"
+        :loading="loading"
+        :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
+        @change="handleTableChange">
+
+        <template slot="avatarslot" slot-scope="text, record, index">
+          <div class="anty-img-wrap">
+            <img :src="getAvatarView(record.avatar)"/>
+          </div>
+        </template>
+
+        <span slot="action" slot-scope="text, record">
+        <a href="javascript:;" @click="handleDetail(record)">详情</a>
+       <a-divider type="vertical"/>
+        <a @click="resumeJob(record.id)" v-if="record.audit==1">通过审核</a>
+        </span>
+        <!-- 状态渲染模板 -->
+        <template slot="customRenderStatus" slot-scope="audit, record">
+          <a-tag v-if="audit==1" color="orange">未审核</a-tag>
+        </template>
+
+      </a-table>
+    </div>
+    <!-- table区域-end -->
+
+    <user-modal ref="modalForm" @ok="modalFormOk"></user-modal>
+
+    <password-modal ref="passwordmodal" @ok="passwordModalOk"></password-modal>
+
+  </a-card>
+</template>
+
+<script>
+  import UserModal from './modules/UserModal'
+  import PasswordModal from './modules/PasswordModal'
+  import { putAction } from '@/api/manage'
+  import { frozenBatchs } from '@/api/api'
+  import { JeecgListMixin } from '@/mixins/JeecgListMixin'
+  export default {
+    name: 'UserList',
+    mixins: [JeecgListMixin],
+    components: {
+      UserModal,
+      PasswordModal
+    },
+    data() {
+      return {
+        description: '这是用户管理页面',
+        queryParam: {},
+        columns: [
+          {
+            title: '用户账号',
+            align: 'center',
+            dataIndex: 'username',
+            width: 120
+          },
+          {
+            title: '真实姓名',
+            align: 'center',
+            width: 100,
+            dataIndex: 'realname'
+          },
+          {
+            title: '头像',
+            align: 'center',
+            width: 120,
+            dataIndex: 'avatar',
+            scopedSlots: { customRender: 'avatarslot' }
+          },
+
+          {
+            title: '性别',
+            align: 'center',
+            width: 80,
+            dataIndex: 'sex_dictText'
+          },
+          {
+            title: '生日',
+            align: 'center',
+            width: 180,
+            dataIndex: 'birthday'
+          },
+          {
+            title: '手机号码',
+            align: 'center',
+            width: 100,
+            dataIndex: 'phone'
+          },
+          {
+            title: '邮箱',
+            align: 'center',
+            dataIndex: 'email'
+          },
+          {
+            title: '状态',
+            align: 'center',
+            width: 80,
+            dataIndex: 'audit',
+            scopedSlots: { customRender: 'customRenderStatus' },
+            filterMultiple: false,
+            filters: [
+              { text: '未审核', value: '1' },
+            ]
+          },
+          {
+            title: '操作',
+            dataIndex: 'action',
+            scopedSlots: { customRender: 'action' },
+            align: 'center',
+            width: 170
+          }
+
+        ],
+        url: {
+          imgerver: window._CONFIG['domianURL'] + '/sys/common/view',
+          list: '/sys/user/list?audit=' + '1',
+          deleteBatch: '/sys/user/deleteBatch',
+          exportXlsUrl: 'sys/user/exportXls',
+          importExcelUrl: 'sys/user/importExcel'
+        }
+      }
+    },
+    computed: {
+      importExcelUrl: function() {
+        return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`
+      }
+    },
+    methods: {
+      getAvatarView: function(avatar) {
+        return this.url.imgerver + '/' + avatar
+      },
+
+      handleMenuClick(e) {
+        if (e.key == 1) {
+          this.batchDel()
+        } else if (e.key == 2) {
+          this.batchFrozen(2)
+        } else if (e.key == 3) {
+          this.batchFrozen(1)
+        }
+      },
+      resumeJob: function(record){
+        var that = this;
+        //恢复定时任务
+        this.$confirm({
+          title:"用户审批",
+          content:"是否通过审批?",
+          onOk: function(){
+            putAction('/sys/user/auditing?userid='+record).then((res)=>{
+              if(res.success){
+                that.$message.success(res.message);
+                that.loadData();
+                that.onClearSelected();
+              }else{
+                that.$message.warning(res.message);
+              }
+            });
+          }
+        });
+      },
+      handleChangePassword(username) {
+        this.$refs.passwordmodal.show(username)
+      },
+      handleSyncUser() {
+        var that = this
+        putAction(that.url.syncUser, {}).then((res) => {
+          if (res.success) {
+            that.$message.success(res.message)
+          } else {
+            that.$message.warning(res.message)
+          }
+        })
+      },
+      passwordModalOk() {
+        //TODO 密码修改完成 不需要刷新页面，可以把datasource中的数据更新一下
+      }
+    }
+
+  }
+</script>
+<style scoped>
+  /** Button按钮间距 */
+  .ant-btn {
+    margin-left: 3px
+  }
+
+  .ant-card-body {
+    margin-bottom: 18px;
+  }
+
+  .table-operator button {
+    margin-bottom: 18px;
+    margin-right: 5px;
+  }
+
+  .ant-table-tbody .ant-table-row td {
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
+
+  .anty-row-operator button {
+    margin: 0 5px
+  }
+
+  .ant-btn-danger {
+    background-color: #ffffff
+  }
+
+  .ant-modal-cust-warp {
+    height: 100%
+  }
+
+  .ant-modal-cust-warp .ant-modal-body {
+    height: calc(100% - 110px) !important;
+    overflow-y: auto
+  }
+
+  .ant-modal-cust-warp .ant-modal-content {
+    height: 90% !important;
+    overflow-y: hidden
+  }
+
+  .anty-img-wrap {
+    height: 25px;
+    position: relative;
+  }
+
+  .anty-img-wrap > img {
+    max-height: 100%;
+  }
+</style>
